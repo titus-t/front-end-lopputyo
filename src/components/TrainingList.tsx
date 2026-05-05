@@ -38,7 +38,6 @@ export default function TrainingList() {
 
   const deleteTraining = (id: number) => {
     if (window.confirm("Are you sure you want to delete this training?")) {
-      // Huom: Poisto-osoite on /trainings/id
       fetch(`${import.meta.env.VITE_API_URL}/trainings/${id}`, {
         method: "DELETE",
       })

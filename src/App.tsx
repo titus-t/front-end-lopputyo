@@ -1,4 +1,11 @@
-import { CssBaseline, Container, AppBar, Toolbar, Typography, Button } from "@mui/material";
+import {
+  CssBaseline,
+  Container,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+} from "@mui/material";
 import { Link, Outlet } from "react-router";
 
 function App() {
@@ -15,6 +22,9 @@ function App() {
           </Button>
           <Button color="inherit" component={Link} to="/trainings">
             Trainings
+          </Button>
+          <Button color="inherit" component={Link} to="/calendar">
+            Calendar
           </Button>
         </Toolbar>
       </AppBar>
