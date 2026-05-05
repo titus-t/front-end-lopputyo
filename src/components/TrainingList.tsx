@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
+import { Button, Snackbar } from "@mui/material";
 import dayjs from "dayjs";
 
 type Training = {
@@ -16,6 +17,42 @@ type Training = {
 
 export default function TrainingList() {
   const [trainings, setTrainings] = useState<Training[]>([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const fetchTrainings = () => {
+    fetch(`${import.meta.env.VITE_API_URL}/gettrainings`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error fetching trainings");
+        }
+        return response.json();
+      })
+      .then((data) => setTrainings(data))
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchTrainings();
+  }, []);
+
+  const deleteTraining = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this training?")) {
+      // Huom: Poisto-osoite on /trainings/id
+      fetch(`${import.meta.env.VITE_API_URL}/trainings/${id}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error in deletion");
+          }
+          fetchTrainings();
+          setSnackbarMessage("Training deleted successfully");
+          setOpenSnackbar(true);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
 
   const columns: GridColDef[] = [
     {
@@ -37,21 +74,23 @@ export default function TrainingList() {
         return "";
       },
     },
+    {
+      field: "delete",
+      headerName: "",
+      width: 90,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Button
+          color="error"
+          size="small"
+          onClick={() => deleteTraining(params.row.id)}
+        >
+          Delete
+        </Button>
+      ),
+    },
   ];
-
-  useEffect(() => {
-    fetch(
-      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/gettrainings",
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error fetching trainings");
-        }
-        return response.json();
-      })
-      .then((data) => setTrainings(data))
-      .catch((err) => console.error(err));
-  }, []);
 
   return (
     <div style={{ height: 600, width: "100%" }}>
@@ -66,6 +105,12 @@ export default function TrainingList() {
             showQuickFilter: true,
           },
         }}
+      />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setOpenSnackbar(false)}
+        message={snackbarMessage}
       />
     </div>
   );
