@@ -1,39 +1,18 @@
 import { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-
-type Customer = {
-  firstname: string;
-  lastname: string;
-  streetaddress: string;
-  postcode: string;
-  city: string;
-  email: string;
-  phone: string;
-  _links: {
-    self: {
-      href: string;
-    };
-  };
-};
+import { Button, Snackbar, Stack } from "@mui/material";
+import type { Customer, CustomerData } from "../types";
+import AddCustomer from "./AddCustomer";
+import EditCustomer from "./EditCustomer";
 
 export default function CustomerList() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<CustomerData[]>([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const columns: GridColDef[] = [
-    { field: "firstname", headerName: "First Name", width: 150 },
-    { field: "lastname", headerName: "Last Name", width: 150 },
-    { field: "streetaddress", headerName: "Address", width: 200 },
-    { field: "postcode", headerName: "Postcode", width: 120 },
-    { field: "city", headerName: "City", width: 150 },
-    { field: "email", headerName: "Email", width: 200 },
-    { field: "phone", headerName: "Phone", width: 150 },
-  ];
-
-  useEffect(() => {
-    fetch(
-      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers",
-    )
+  const fetchCustomers = () => {
+    fetch(`${import.meta.env.VITE_API_URL}/customers`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching customers");
@@ -42,22 +21,128 @@ export default function CustomerList() {
       })
       .then((data) => setCustomers(data._embedded.customers))
       .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchCustomers();
   }, []);
 
+  const deleteCustomer = (url: string) => {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      fetch(url, { method: "DELETE" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error in deletion");
+          }
+          fetchCustomers();
+          setSnackbarMessage("Customer deleted successfully");
+          setOpenSnackbar(true);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const handleAdd = (customer: Customer) => {
+    fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(customer),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Error adding customer");
+        return response.json();
+      })
+      .then(() => {
+        fetchCustomers();
+        setSnackbarMessage("Customer added successfully");
+        setOpenSnackbar(true);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleUpdate = (url: string, updatedCustomer: Customer) => {
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedCustomer),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Error editing customer");
+        return response.json();
+      })
+      .then(() => {
+        fetchCustomers();
+        setSnackbarMessage("Customer updated successfully");
+        setOpenSnackbar(true);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const columns: GridColDef[] = [
+    { field: "firstname", headerName: "First Name", width: 130 },
+    { field: "lastname", headerName: "Last Name", width: 130 },
+    { field: "streetaddress", headerName: "Address", width: 180 },
+    { field: "postcode", headerName: "Postcode", width: 100 },
+    { field: "city", headerName: "City", width: 130 },
+    { field: "email", headerName: "Email", width: 180 },
+    { field: "phone", headerName: "Phone", width: 130 },
+    {
+      field: "edit",
+      headerName: "",
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <EditCustomer customer={params.row} handleUpdate={handleUpdate} />
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "",
+      width: 90,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Button
+          color="error"
+          size="small"
+          onClick={() => deleteCustomer(params.row._links.self.href)}
+        >
+          Delete
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <div style={{ height: 600, width: "100%" }}>
-      <DataGrid
-        rows={customers}
-        columns={columns}
-        getRowId={(row) => row._links.self.href}
-        disableRowSelectionOnClick
-        showToolbar
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
-      />
-    </div>
+    <>
+      <Stack sx={{ mt: 2, mb: 2 }} direction="row">
+        <AddCustomer handleAdd={handleAdd} />
+      </Stack>
+      <div style={{ height: 600, width: "100%" }}>
+        <DataGrid
+          rows={customers}
+          columns={columns}
+          getRowId={(row) => row._links.self.href}
+          disableRowSelectionOnClick
+          showToolbar
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+            },
+          }}
+        />
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          message={snackbarMessage}
+        />
+      </div>
+    </>
   );
 }
