@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import type { GridColDef } from "@mui/x-data-grid";
 
 type Customer = {
   firstname: string;
@@ -50,6 +51,12 @@ export default function CustomerList() {
         columns={columns}
         getRowId={(row) => row._links.self.href}
         disableRowSelectionOnClick
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </div>
   );

@@ -60,6 +60,12 @@ export default function TrainingList() {
         columns={columns}
         getRowId={(row) => row.id}
         disableRowSelectionOnClick
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </div>
   );
