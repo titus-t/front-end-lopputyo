@@ -5,6 +5,7 @@ import { Button, Snackbar, Stack } from "@mui/material";
 import type { Customer, CustomerData } from "../types";
 import AddCustomer from "./AddCustomer";
 import EditCustomer from "./EditCustomer";
+import AddTraining from "./AddTraining";
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState<CustomerData[]>([]);
@@ -82,6 +83,25 @@ export default function CustomerList() {
       .catch((err) => console.error(err));
   };
 
+  const saveTraining = (training: any) => {
+    fetch(`${import.meta.env.VITE_API_URL}/trainings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(training),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Error while adding training");
+        return response.json();
+      })
+      .then(() => {
+        setSnackbarMessage("Training added successfully");
+        setOpenSnackbar(true);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const columns: GridColDef[] = [
     { field: "firstname", headerName: "First Name", width: 130 },
     { field: "lastname", headerName: "Last Name", width: 130 },
@@ -90,6 +110,19 @@ export default function CustomerList() {
     { field: "city", headerName: "City", width: 130 },
     { field: "email", headerName: "Email", width: 180 },
     { field: "phone", headerName: "Phone", width: 130 },
+    {
+      field: "addTraining",
+      headerName: "",
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <AddTraining
+          customerUrl={params.row._links.self.href}
+          saveTraining={saveTraining}
+        />
+      ),
+    },
     {
       field: "edit",
       headerName: "",
