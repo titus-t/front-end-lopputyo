@@ -79,6 +79,7 @@ export default function TrainingList() {
       width: 90,
       sortable: false,
       filterable: false,
+      disableExport: true,
       renderCell: (params: GridRenderCellParams) => (
         <Button
           color="error"
