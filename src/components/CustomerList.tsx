@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  DataGrid,
-  type GridRenderCellParams,
-  GridToolbar,
-} from "@mui/x-data-grid";
+import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Button, Snackbar, Stack } from "@mui/material";
 import type { Customer, CustomerData } from "../types";
@@ -152,7 +148,7 @@ export default function CustomerList() {
           columns={columns}
           getRowId={(row) => row._links.self.href}
           disableRowSelectionOnClick
-          slots={{ toolbar: GridToolbar }}
+          showToolbar
           slotProps={{
             toolbar: {
               showQuickFilter: true,
