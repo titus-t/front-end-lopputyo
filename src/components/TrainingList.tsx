@@ -66,7 +66,7 @@ export default function TrainingList() {
       field: "customer",
       headerName: "Customer",
       width: 200,
-      valueGetter: (value, row) => {
+      valueGetter: (_value, row) => {
         if (row.customer) {
           return `${row.customer.firstname} ${row.customer.lastname}`;
         }

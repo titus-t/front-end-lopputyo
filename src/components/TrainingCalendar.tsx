@@ -25,9 +25,7 @@ type CalendarEvent = {
 export default function TrainingCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentView, setCurrentView] = useState<"month" | "week" | "day">(
-    "week",
-  );
+  const [currentView, setCurrentView] = useState<any>("week");
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/gettrainings`)

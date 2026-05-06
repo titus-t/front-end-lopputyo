@@ -4,9 +4,9 @@ import App from "./App.tsx";
 import CustomerList from "./components/CustomerList.tsx";
 import TrainingList from "./components/TrainingList.tsx";
 import TrainingCalendar from "./components/TrainingCalendar.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createHashRouter, RouterProvider } from "react-router";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,

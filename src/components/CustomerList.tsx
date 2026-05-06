@@ -152,7 +152,7 @@ export default function CustomerList() {
           columns={columns}
           getRowId={(row) => row._links.self.href}
           disableRowSelectionOnClick
-          showToolbar
+          slots={{ toolbar: GridToolbar }}
           slotProps={{
             toolbar: {
               showQuickFilter: true,
