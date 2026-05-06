@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  type GridRenderCellParams,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Button, Snackbar, Stack } from "@mui/material";
 import type { Customer, CustomerData } from "../types";
@@ -110,43 +114,29 @@ export default function CustomerList() {
     { field: "city", headerName: "City", width: 130 },
     { field: "email", headerName: "Email", width: 180 },
     { field: "phone", headerName: "Phone", width: 130 },
+
     {
-      field: "addTraining",
-      headerName: "",
-      width: 120,
+      field: "actions",
+      headerName: "Actions",
+      width: 250,
       sortable: false,
       filterable: false,
+      disableExport: true,
       renderCell: (params: GridRenderCellParams) => (
-        <AddTraining
-          customerUrl={params.row._links.self.href}
-          saveTraining={saveTraining}
-        />
-      ),
-    },
-    {
-      field: "edit",
-      headerName: "",
-      width: 80,
-      sortable: false,
-      filterable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <EditCustomer customer={params.row} handleUpdate={handleUpdate} />
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "",
-      width: 90,
-      sortable: false,
-      filterable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Button
-          color="error"
-          size="small"
-          onClick={() => deleteCustomer(params.row._links.self.href)}
-        >
-          Delete
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <AddTraining
+            customerUrl={params.row._links.self.href}
+            saveTraining={saveTraining}
+          />
+          <EditCustomer customer={params.row} handleUpdate={handleUpdate} />
+          <Button
+            color="error"
+            size="small"
+            onClick={() => deleteCustomer(params.row._links.self.href)}
+          >
+            Delete
+          </Button>
+        </Stack>
       ),
     },
   ];
